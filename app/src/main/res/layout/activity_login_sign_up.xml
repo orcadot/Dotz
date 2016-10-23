@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:gravity="center"
+        tools:context="com.orca.dot.auth.LoginSignUpActivity">
+
+        <TextView
+            android:text="@string/welcome_string"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="@color/text_primary_dark"
+            android:fontFamily="sans-serif-medium"
+            style="@style/TextAppearance.AppCompat.Headline" />
+
+        <TextView
+            android:text="@string/verify_number_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/text_secondary_dark"
+            style="@style/TextAppearance.AppCompat.Subhead" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="32dp"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:text="+91"
+                android:enabled="false"
+                android:textColor="@color/text_primary_dark" />
+
+            <EditText
+                android:id="@+id/phone_number_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/phone_number_field_hint"
+                android:textColor="@color/text_primary_dark"
+                android:inputType="phone"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="48dp"
+            android:layout_marginRight="48dp"
+            android:layout_marginTop="32dp"
+            android:elevation="4dp"
+            android:stateListAnimator="@animator/login_button_anim"
+            android:layout_toLeftOf="@+id/next_icon"
+            android:text="@string/next_string"
+            android:textColor="@color/text_secondary_light"
+            android:background="@drawable/login_button_ripple"></Button>
+    </LinearLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>

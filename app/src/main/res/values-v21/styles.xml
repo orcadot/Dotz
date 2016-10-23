@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme.Dot.Login" parent="AppTheme.Dot">
+        <item name="android:statusBarColor">@color/scrim</item>
+    </style>
+</resources>

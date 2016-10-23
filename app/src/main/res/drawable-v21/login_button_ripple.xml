@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <item android:state_selected="false">
+        <ripple android:color="#FFF" tools:targetApi="lollipop">
+            <item>
+                <shape android:shape="rectangle">
+
+                    <corners android:radius="24dp"></corners>
+                    <solid android:color="@color/designer_news_dark" />
+
+                    <padding android:bottom="0dp" android:left="0dp" android:right="0dp" android:top="0dp" />
+
+                    <size android:width="240dp" android:height="48dp" />
+                </shape>
+            </item>
+        </ripple>
+    </item>
+</selector>

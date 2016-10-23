@@ -1,0 +1,36 @@
+<resources>
+
+    <!-- Root styles that vary by API level -->
+
+    <!-- Disable RTL support on older devices -->
+    <!-- Prevents crash on certain devices to namespace conflict -->
+
+    <style name="AppRoot.Theme" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <style name="AppRoot.Widget" parent="Theme.AppCompat.NoActionBar" />
+
+    <!-- Immediate parent theme to specify base values for custom attributes -->
+    <style name="AppTheme" parent="AppRoot.Theme" />
+
+    <style name="AppTheme.Dot.Base" parent="AppTheme">
+
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/error</item>
+        <item name="colorControlActivated">@color/designer_news_dark</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@android:color/white</item>
+
+        <item name="android:borderlessButtonStyle">@style/Widget.AppCompat.Button.Borderless</item>
+    </style>
+
+    <style name="AppTheme.Dot" parent="AppTheme.Dot.Base" />
+
+    <style name="AppTheme.Dot.Splash" parent="AppTheme.Dot">
+        <item name="android:windowBackground">@drawable/splash_drawable</item>
+    </style>
+</resources>
