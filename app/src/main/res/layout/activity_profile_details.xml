@@ -2,52 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:orientation="vertical">
 
-
-    <EditText
-        android:id="@+id/name_edit_text"
+    <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Name"
-        android:inputType="textPersonName" />
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:elevation="10dp"></android.support.v7.widget.Toolbar>
 
-    <EditText
-        android:id="@+id/email_edit_text"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress" />
-
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/radio_group_gender">
-
-        <RadioButton
-            android:id="@+id/radio_btn_male"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Male" />
-
-        <RadioButton
-            android:id="@+id/radio_btn_female"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Female" />
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/profile_save_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SAVE" />
+        android:layout_height="match_parent"
+        android:id="@+id/content_fragment"></FrameLayout>
 </LinearLayout>

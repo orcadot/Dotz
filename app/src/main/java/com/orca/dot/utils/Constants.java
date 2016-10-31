@@ -10,12 +10,14 @@ public class Constants {
     public static final String PACKAGE_NAME = "com.orca.dotz";
 
     /**
-     * Constants related to locations in Firebase, such as the name of the node
+     * Constants related to locations in Firebase, such as the Name of the node
      * where user lists are stored (ie "userLists")
      */
     public static final String FIREBASE_LOCATION_HAIR_STYLE_DATA = "data";
     public static final String FIREBASE_SALON_DATA = "salonData";
-    public static final String FIREBASE_LOCATION_USER_LISTS = "userLists";
+    public static final String FIREBASE_LOCATION_USER_LISTS = "Users";
+    public static final String FIREBASE_LOCATION_USER_FAVORITE = "my_favs";
+    public static final String FIREBASE_LOCATION_USER_CART = "my_cart";
 
     /**
      * Constants for bundles, extras and shared preferences keys
@@ -27,6 +29,11 @@ public class Constants {
     private static final String TYPE_UNISEX_STRING = "Unisex";
     private static final String TYPE_MALE_STRING = "Male";
     private static final String TYPE_FEMALE_STRING = "Female";
+    public static final int FRAGMENT_PROFILE_DETAILS = 0;
+    public static final int FRAGMENT_FACECUT = 1;
+    public static final String FIREBASE_STYLE_DATA_NODE = "services";
+    public static final String NUMBER_OF_LIKES_FOR_STYLES = "numLikes";
+    public static final String USER_NAME_KEY = "USER_NAME_INTENT_KEY";
 
 
     /**
@@ -59,5 +66,14 @@ public class Constants {
 
     // OTP mismathced;
     public static final int OTP_VERIFICATION_ERROR = 3001;
+
+    /**
+     * Constants for viewtype in StylesActivity Styles
+     */
+    public static final int GRID_ITEM = -10;
+    public static final int LIST_ITEM = -20;
+
+    public static final int LIKE_UPDATE = 10;
+    public static final int CART_UPDATE = 20;
 
 }

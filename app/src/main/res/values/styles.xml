@@ -14,14 +14,13 @@
 
     <style name="AppTheme.Dot.Base" parent="AppTheme">
 
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/error</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/designer_news_dark</item>
         <item name="colorControlActivated">@color/designer_news_dark</item>
-
+        <item name="toolbarStyle">@style/Widget.AppTheme.Toolbar</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
-
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@android:color/white</item>
 
@@ -33,4 +32,25 @@
     <style name="AppTheme.Dot.Splash" parent="AppTheme.Dot">
         <item name="android:windowBackground">@drawable/splash_drawable</item>
     </style>
+
+
+    <style name="Widget.AppTheme.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/primary</item>
+    </style>
+
+    <style name="Widget.AppTheme.Toolbar.Style" parent="Widget.AppTheme.Toolbar">
+        <item name="titleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title
+        </item>
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="tabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
+
+    </style>
+
 </resources>

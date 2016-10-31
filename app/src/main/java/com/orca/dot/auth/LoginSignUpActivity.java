@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -92,6 +93,7 @@ public class LoginSignUpActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.next_button:
+                hideSoftKeyBoard();
                 authenticateNumber();
                 break;
             default:
@@ -133,6 +135,14 @@ public class LoginSignUpActivity extends AppCompatActivity implements View.OnCli
                 .show();
         if (progressDialog != null) {
             progressDialog.dismiss();
+        }
+    }
+
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if (imm.isAcceptingText()) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
 }

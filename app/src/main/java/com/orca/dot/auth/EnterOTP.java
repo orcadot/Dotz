@@ -25,9 +25,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.R;
 import com.orca.dot.auth.callbacks.OTPVerificationCallback;
 import com.orca.dot.auth.internal.OTPVerification;
+import com.orca.dot.model.UserDetails;
+import com.orca.dot.services.StylesActivity;
+import com.orca.dot.utils.Constants;
 
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener {
 
@@ -67,6 +75,8 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
             }
         }
     };
+    private DatabaseReference mDatabase;
+    private ValueEventListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,26 +117,66 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    updateUI();
+                    updateUI(user);
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-                // [START_EXCLUDE]
-
-                // [END_EXCLUDE]
             }
         };
         // [END auth_state_listener]
     }
 
-    private void updateUI() {
-        if (progressDialog != null)
-            progressDialog.dismiss();
-        Intent i = new Intent(EnterOTP.this, ProfileDetailsActivity.class);
-        startActivity(i);
-        finish();
+    private void updateUI(FirebaseUser user) {
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_LOCATION_USER_LISTS).child(user.getUid());
+        mDatabase.keepSynced(true);
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange() called with: dataSnapshot = [" + dataSnapshot + "]");
+                if (dataSnapshot.getValue() == null) {
+                    Intent intent = new Intent(EnterOTP.this, ProfileDetailsActivity.class);
+                    intent.putExtra("FRAGMENT_ID", Constants.FRAGMENT_PROFILE_DETAILS);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    UserDetails userDetails = dataSnapshot.getValue(UserDetails.class);
+                    if (userDetails.isFCTFilled) {
+                        Log.i(TAG, "onDataChange: " + userDetails.username);
+                        Intent intent = new Intent(EnterOTP.this, StylesActivity.class);
+                        intent.putExtra(Constants.USER_NAME_KEY, userDetails.username);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Intent intent = new Intent(EnterOTP.this, ProfileDetailsActivity.class);
+                        intent.putExtra("FRAGMENT_ID", Constants.FRAGMENT_FACECUT);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                if (progressDialog != null)
+                    progressDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                Toast.makeText(EnterOTP.this, "Failed to load user details.",
+                        Toast.LENGTH_SHORT).show();
+                if (progressDialog != null)
+                    progressDialog.dismiss();
+            }
+
+
+        };
+
+        mDatabase.addValueEventListener(valueEventListener);
+
+        mListener = valueEventListener;
+
 
     }
 
@@ -166,6 +216,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
                         Log.d(TAG, "signInWithCustomToken:onComplete:" + task.isSuccessful());
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCustomToken", task.getException());
+
+                            if (progressDialog != null) {
+                                progressDialog.dismiss();
+                            }
                             Intent intent = new Intent(EnterOTP.this, LoginSignUpActivity.class);
                             startActivity(intent);
                             finish();
@@ -212,7 +266,12 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
     @Override
     protected void onStop() {
         super.onStop();
-        mAuth.removeAuthStateListener(mAuthListener);
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+        if (mListener != null) {
+            mDatabase.removeEventListener(mListener);
+        }
     }
 
 

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="2dp">
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_gravity="top"
+        android:layout_marginBottom="72dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/back" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="48dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:text="Long Spikes"
+        android:textColor="@color/text_primary_dark"
+        android:textSize="16sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:gravity="center_vertical"
+        android:layout_gravity="bottom">
+
+        <ImageView
+            android:id="@+id/fav"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:background="?attr/selectableItemBackground"
+
+            app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
+
+        <Button
+            android:id="@+id/cart"
+            android:layout_width="56dp"
+            android:layout_height="24dp"
+            android:layout_alignBottom="@+id/numLikes"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/add_to_cart_back"
+            android:text="+ ADD"
+            android:textSize="12sp"
+            android:textColor="@color/light_icon"
+            android:layout_centerVertical="true" />
+
+        <TextView
+            android:id="@+id/numLikes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_toEndOf="@+id/fav"
+            android:layout_toRightOf="@+id/fav"
+            android:gravity="left"
+            android:text="0 Likes"
+            android:textColor="@color/text_secondary_dark"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

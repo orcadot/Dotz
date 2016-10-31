@@ -18,7 +18,9 @@
         <activity
             android:name=".welcome.WelcomeActivity"
             android:theme="@style/AppTheme.Dot.Splash"></activity>
-        <activity android:name=".services.HomeActivity" />
+        <activity
+            android:name=".services.StylesActivity"
+            android:theme="@style/AppTheme.Dot.Home" />
         <activity
             android:name=".auth.LoginSignUpActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
@@ -31,7 +33,12 @@
             android:screenOrientation="portrait"></activity>
 
 
-        <activity android:name=".auth.ProfileDetailsActivity" />
+        <activity
+            android:name=".auth.ProfileDetailsActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:screenOrientation="portrait" />
+        <activity android:name=".services.Favourite" />
+        <activity android:name=".services.Cart" />
 
         <activity-alias
             android:name=".Launcher"

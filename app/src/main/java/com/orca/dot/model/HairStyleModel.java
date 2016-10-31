@@ -83,7 +83,7 @@ public class HairStyleModel {
     }
 
     /**
-     * @return length
+     * @return Length
      */
     public String getLength() {
         return length;
@@ -97,7 +97,7 @@ public class HairStyleModel {
     }
 
     /**
-     * @return name
+     * @return Name
      */
     public String getName() {
         return name;

@@ -13,5 +13,26 @@
     <string name="profile_filled">PROFILE_FILLED</string>
     <string name="user_uid">USER_UID</string>
     <string name="welcome_string">Welcome to DOT</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="facecut_known_string">If you know your face cut, select one</string>
+    <string name="know_fct_string">Know your Facecut</string>
+    <string name="done_string">Done</string>
+    <string name="fct_filled">FCT_FILLED</string>
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
+    <string name="action_cart">Cart</string>
+    <string name="action_fav">Favorite</string>
+    <string name="action_search">Search</string>
+    <string name="action_layout">ListView</string>
+
+    <string-array name="fct_array">
+        <item>Diamond</item>
+        <item>Heart</item>
+        <item>Sqaure</item>
+        <item>Oval</item>
+        <item>Oblong</item>
+        <item>Round</item>
+    </string-array>
 </resources>
 

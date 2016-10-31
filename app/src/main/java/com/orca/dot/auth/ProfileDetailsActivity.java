@@ -1,13 +1,14 @@
 package com.orca.dot.auth;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,70 +16,110 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.orca.dot.R;
+import com.orca.dot.auth.fragments.FacecutDetectFragment;
+import com.orca.dot.auth.fragments.ProfileDetailsFragment;
 import com.orca.dot.model.UserDetails;
-import com.orca.dot.services.HomeActivity;
+import com.orca.dot.services.StylesActivity;
+import com.orca.dot.utils.Constants;
 
-public class ProfileDetailsActivity extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
+
+public class ProfileDetailsActivity extends AppCompatActivity implements ProfileDetailsFragment.OnProfileSaveClickListener, FacecutDetectFragment.OnFacecutDetectClickListener {
 
     private static final String TAG = "ProfileDetailsActivity";
 
-    private EditText nameEditText;
-    private EditText emailEditText;
-    private RadioGroup genderRadioGroup;
-    private Button profileSaveButton;
-    private String currentUserId;
-    private String mGender;
-    private int mGenderCode;
+    private Fragment fragment;
+    private FirebaseUser currentUser;
+    private ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_profile_details);
+        if (getIntent().getIntExtra("FRAGMENT_ID", 0) == Constants.FRAGMENT_PROFILE_DETAILS)
+            fragment = ProfileDetailsFragment.newInstance();
+        else
+            fragment = FacecutDetectFragment.newInstance();
 
-        bindUI();
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.content_fragment, fragment);
+        fragmentTransaction.commit();
+        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
 
     }
 
-    private void bindUI() {
-        nameEditText = (EditText) findViewById(R.id.name_edit_text);
-        emailEditText = (EditText) findViewById(R.id.email_edit_text);
-        genderRadioGroup = (RadioGroup) findViewById(R.id.radio_group_gender);
-        genderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.radio_btn_male:
-                        Log.i(TAG, "onCheckedChanged: male");
-                        break;
-                    case R.id.radio_btn_female:
-                        Log.i(TAG, "onCheckedChanged: female");
-                        break;
-                    default:
-                }
-            }
-        });
-        profileSaveButton = (Button) findViewById(R.id.profile_save_button);
-        profileSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveProfileToFirebase();
-            }
-        });
-    }
 
-    private void saveProfileToFirebase() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    @Override
+    public void onProfileSave(UserDetails userDetails) {
+        hideSoftKeyBoard();
         if (currentUser != null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Saving your details");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference databaseReference = database.getReference();
-            UserDetails userDetails = new UserDetails(nameEditText.getText().toString().trim(), emailEditText.getText().toString().trim(), mGender, mGenderCode);
             databaseReference.child("Users").child(currentUser.getUid()).setValue(userDetails, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    startActivity(new Intent(ProfileDetailsActivity.this, HomeActivity.class));
-                    finish();
+                    if (databaseError == null) {
+                        fragment = FacecutDetectFragment.newInstance();
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.replace(R.id.content_fragment, fragment);
+                        fragmentTransaction.commit();
+                        progressDialog.dismiss();
+                    } else
+                        Snackbar.make(fragment.getView(), databaseError.getMessage(), Snackbar.LENGTH_LONG).show();
                 }
             });
         }
     }
+
+    @Override
+    public void onFacecutSelect(int facecut, String fct) {
+        hideSoftKeyBoard();
+        if (currentUser != null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Saving your facecut");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference databaseReference = database.getReference();
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("facecut", fct);
+            updates.put("facecut_type", facecut);
+            updates.put("isFCTFilled", true);
+
+            databaseReference.child(Constants.FIREBASE_LOCATION_USER_LISTS + "/" + currentUser.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        startActivity(new Intent(ProfileDetailsActivity.this, StylesActivity.class));
+                        progressDialog.dismiss();
+                        finish();
+                    } else
+                        Snackbar.make(fragment.getView(), databaseError.getMessage(), Snackbar.LENGTH_LONG).show();
+                }
+            });
+        }
+
+    }
+
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if (imm.isAcceptingText()) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
 }

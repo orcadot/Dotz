@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircularImageView">
+        <attr name="myborderWidth" format="dimension" />
+        <attr name="myborderColor" format="color" />
+        <attr name="myborderOverlay" format="boolean" />
+        <attr name="myfillColor" format="color" />
+    </declare-styleable>
+    <declare-styleable name="pull">
+        <attr name="header" format="reference|integer" />
+        <attr name="maxHeaderHeight" format="reference|dimension" />
+        <attr name="minHeaderHeight" format="reference|dimension" />
+    </declare-styleable>
+    <declare-styleable name="Mypager">
+        <!-- Child view inside a page to match the page size against. -->
+        <attr name="matchChildWidth" format="reference" />
+        <!-- Maximum size. -->
+        <attr name="android:maxWidth" />
+        <!-- Maximum size. -->
+        <attr name="android:maxHeight" />
+    </declare-styleable>
+
+    <declare-styleable name="Picker">
+        <attr name="canvasColor" format="color" />
+
+        <attr name="clockColor" format="color" />
+
+        <attr name="textColor" format="color" />
+
+        <attr name="dialColor" format="color" />
+
+        <attr name="hourFormat" format="boolean" />
+
+        <attr name="trackSize" format="dimension" />
+
+        <attr name="dialRadius" format="dimension" />
+
+    </declare-styleable>
+
+    <declare-styleable name="Ranger">
+
+        <!-- Behaviour attributes -->
+        <attr name="displayDayOfWeek" format="boolean" />
+        <attr name="alwaysDisplayMonth" format="boolean" />
+
+        <!-- Days Container styling -->
+        <attr name="daysContainerBackgroundColor" format="color" />
+
+        <attr name="dayTextColor" format="color" />
+        <attr name="selectedDayTextColor" format="color" />
+        <attr name="selectedDayBackgroundColor" format="color" />
+
+        <!-- Day View styling -->
+        <attr name="dayOfWeekTextColor" format="color" />
+        <attr name="dayNumberTextColor" format="color" />
+        <attr name="monthNameTextColor" format="color" />
+
+    </declare-styleable>
+
+    <declare-styleable name="CenteringRecyclerView">
+        <attr name="ignoreIfVisible" format="boolean" />
+        <attr name="ignoreIfCompletelyVisible" format="boolean" />
+    </declare-styleable>
+</resources>
