@@ -10,23 +10,25 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class HairStyle {
+public class HairStyle extends BaseModel{
     public String Name;
     public String Image;
-    public String Length;
     public String uniqueKey;
     public int likesCount;
     public Map<String, Boolean> likes = new HashMap<>();
     public Map<String, Boolean> carts = new HashMap<>();
+    public Map<String, Boolean> filters = new HashMap<>();
 
     public HairStyle() {
-
+        super();
     }
 
-    public HairStyle(String name, String image, String length, int likesCount) {
+    public HairStyle(String name, String image, int likesCount, Map likes, Map carts, Map filters) {
         this.Name = name;
         this.Image = image;
-        this.Length = length;
         this.likesCount = likesCount;
+        this.likes = likes;
+        this.carts = carts;
+        this.filters = filters;
     }
 }

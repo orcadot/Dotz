@@ -1,4 +1,4 @@
-package com.orca.dot.services;
+package com.orca.dot.services.styles;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
@@ -23,14 +22,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.orca.dot.R;
 import com.orca.dot.model.KeyValue;
-import com.orca.dot.services.fragments.StylesFragment;
-import com.orca.dot.services.interfaces.ChangeViewListener;
-import com.orca.dot.services.presenter.StylesDataPresenter;
-import com.orca.dot.services.presenter.TabDataPresenter;
+import com.orca.dot.services.Cart;
+import com.orca.dot.services.favorites.FavoritesActivity;
+import com.orca.dot.ui.BaseActivity;
 import com.orca.dot.utils.Constants;
 
 import java.lang.ref.WeakReference;
@@ -39,27 +36,17 @@ import java.util.List;
 
 /**
  * A StylesActivity contains home screen for showing services and products.
- *
- * @author Mayank will work on it.
  */
-public class StylesActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, StylesFragment.Listener, TabDataContracts.View {
-
-    public static RecyclerView.RecycledViewPool recycledViewPool;
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
-
-    private String userName;
-    private ChangeViewListener changeViewListener;
+public class StylesActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, StylesFragment.Listener, TabDataContract.View {
 
     private static final String TAG = "StylesActivity";
-
-
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    private String userName;
     private ViewPagerAdapter adapter;
     private DrawerLayout drawer;
 
-    private StylesDataPresenter mStylesDataPresenter;
-    private TabDataPresenter mTabPresenter;
-    private TabDataContracts.Presenter mTabDataPresenter;
+    private TabDataContract.Presenter mTabDataPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +62,10 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
         initializeUI();
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        assert viewPager != null;
         viewPager.setOffscreenPageLimit(2);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
-        mTabPresenter = new TabDataPresenter(FirebaseDatabase.getInstance().getReference().child("services_keys"), this);
+        new TabDataPresenter(FirebaseDatabase.getInstance().getReference().child("services_keys"), this);
         mTabDataPresenter.start();
 
     }
@@ -86,15 +74,15 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_left);
+        assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
 
         TextView userNameTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
         userNameTextView.setText("Hello! " + userName);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = getToolbar();
+        assert toolbar != null;
         toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,8 +92,6 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
 
     }
 
-    private void initRecycledPool() {
-    }
 
     private void setupViewPager(ViewPager viewPager, List<KeyValue> tabData) {
         adapter = new ViewPagerAdapter(getSupportFragmentManager(), tabData);
@@ -144,7 +130,7 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
                 startActivity(new Intent(StylesActivity.this, Cart.class));
                 break;
             case R.id.action_fav:
-                startActivity(new Intent(StylesActivity.this, Favourite.class));
+                startActivity(new Intent(StylesActivity.this, FavoritesActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -158,14 +144,6 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
             Toast.makeText(this, "Camera clicked", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_gallery) {
             Toast.makeText(this, "Camera clicked", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -174,9 +152,9 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
     }
 
     @Override
-    public void onFragmentViewCreated(StylesFragment stylesFragment, DatabaseReference dataRef) {
+    public void onFragmentViewCreated(StylesFragment stylesFragment, String dataRef) {
         Log.d(TAG, "onFragmentViewCreated() called with: stylesFragment = [" + stylesFragment + "], dataRef = [" + dataRef + "]");
-        mStylesDataPresenter = new StylesDataPresenter(dataRef, stylesFragment);
+        new StylesDataPresenter(dataRef, stylesFragment);
     }
 
     @Override
@@ -190,7 +168,7 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
     }
 
     @Override
-    public void setPresenter(TabDataContracts.Presenter presenter) {
+    public void setPresenter(TabDataContract.Presenter presenter) {
         mTabDataPresenter = presenter;
     }
 
@@ -205,7 +183,7 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
         private final SparseArray<WeakReference<Fragment>> instantiatedFragments = new SparseArray<>();
         private List<KeyValue> tabsData = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager fm, List<KeyValue> tabData) {
+        ViewPagerAdapter(FragmentManager fm, List<KeyValue> tabData) {
             super(fm);
             this.tabsData = tabData;
         }
@@ -239,7 +217,7 @@ public class StylesActivity extends AppCompatActivity implements NavigationView.
         }
 
         @Nullable
-        public Fragment getFragment(final int position) {
+        Fragment getFragment(final int position) {
             final WeakReference<Fragment> wr = instantiatedFragments.get(position);
             if (wr != null) {
                 return wr.get();

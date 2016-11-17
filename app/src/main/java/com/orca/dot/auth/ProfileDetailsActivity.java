@@ -19,7 +19,7 @@ import com.orca.dot.R;
 import com.orca.dot.auth.fragments.FacecutDetectFragment;
 import com.orca.dot.auth.fragments.ProfileDetailsFragment;
 import com.orca.dot.model.UserDetails;
-import com.orca.dot.services.StylesActivity;
+import com.orca.dot.services.styles.StylesActivity;
 import com.orca.dot.utils.Constants;
 
 import java.util.HashMap;

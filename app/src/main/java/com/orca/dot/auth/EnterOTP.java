@@ -34,7 +34,7 @@ import com.orca.dot.R;
 import com.orca.dot.auth.callbacks.OTPVerificationCallback;
 import com.orca.dot.auth.internal.OTPVerification;
 import com.orca.dot.model.UserDetails;
-import com.orca.dot.services.StylesActivity;
+import com.orca.dot.services.styles.StylesActivity;
 import com.orca.dot.utils.Constants;
 
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener {

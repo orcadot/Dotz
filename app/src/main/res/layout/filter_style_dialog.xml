@@ -25,7 +25,7 @@
         android:layout_marginTop="8dp"
         android:orientation="horizontal">
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/small"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -36,7 +36,7 @@
             android:text="S"
             android:textColor="@color/filter_hairstyle" />
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/medium"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -49,7 +49,7 @@
             android:text="M"
             android:textColor="@color/filter_hairstyle" />
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/large"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -81,7 +81,7 @@
         android:orientation="horizontal">
 
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/soft"
             android:layout_width="72dp"
             android:layout_height="36dp"
@@ -94,7 +94,7 @@
             android:textSize="14dp" />
 
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/hard"
             android:layout_width="72dp"
             android:layout_height="36dp"
@@ -126,7 +126,7 @@
         android:layout_marginTop="8dp"
         android:orientation="horizontal">
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/oblong"
             android:layout_width="70dp"
             android:layout_height="36dp"
@@ -138,7 +138,7 @@
             android:textColor="@color/filter_hairstyle"
             android:textSize="12dp" />
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/diamond"
             android:layout_width="70dp"
             android:layout_height="36dp"
@@ -150,7 +150,7 @@
             android:textColor="@color/filter_hairstyle"
             android:textSize="12dp" />
 
-        <com.orca.dot.services.widgets.FilterRadioButton
+        <com.orca.dot.ui.widgets.FilterRadioButton
             android:id="@+id/heart"
             android:layout_width="70dp"
             android:layout_height="36dp"

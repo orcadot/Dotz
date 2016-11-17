@@ -1,4 +1,4 @@
-package com.orca.dot.services.fragments;
+package com.orca.dot.services.styles;
 
 
 import android.content.Context;
@@ -31,10 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.R;
 import com.orca.dot.model.HairStyle;
 import com.orca.dot.services.Cart;
-import com.orca.dot.services.StylesDataContracts;
-import com.orca.dot.services.adapters.StylesAdapter;
-import com.orca.dot.services.interfaces.ChangeViewListener;
-import com.orca.dot.services.widgets.FilterDialog;
+import com.orca.dot.ui.widgets.FilterDialog;
 import com.orca.dot.utils.Constants;
 
 import java.util.List;
@@ -43,13 +40,12 @@ import java.util.List;
 /**
  * Created by master on 17/6/16.
  */
-public class StylesFragment extends Fragment implements FilterDialog.OnDialogClickedListener, StylesDataContracts.View {
+public class StylesFragment extends Fragment implements FilterDialog.OnDialogClickedListener, StylesDataContract.View {
 
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
     private static final String TAG = "StylesFragment";
     private final int SPAN_COUNT = 2;
     public String previousCode = "NANANA";
-    ChangeViewListener changeViewListener;
     private Context mContext = getActivity();
     private int mCategory = -1;
     private RecyclerView recyclerView;
@@ -73,7 +69,7 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     private ChildEventListener cartDataListener;
 
     //My Variables
-    private StylesDataContracts.Presenter mPresenter;
+    private StylesDataContract.Presenter mPresenter;
     private String mDataChildKey;
 
 
@@ -93,7 +89,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDataChildKey = getArguments().getString("data_reference_key");
-        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + mDataChildKey + "]");
         databaseReference = database.getReference(Constants.FIREBASE_STYLE_DATA_NODE).child(mDataChildKey);
     }
 
@@ -106,7 +101,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
         initializeScreen(rootview);
         mCurrentLayoutManagerType = (savedInstanceState != null) ? ((LayoutManagerType) savedInstanceState.getSerializable(KEY_LAYOUT_MANAGER)) : LayoutManagerType.GRID_LAYOUT_MANAGER;
         setRecyclerViewAttr();
-
         return rootview;
     }
 
@@ -161,10 +155,8 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     public void onStart() {
         super.onStart();
         if (getActivity() instanceof Listener) {
-            ((Listener) getActivity()).onFragmentViewCreated(this, databaseReference);
-            Log.i(TAG, "onViewCreated: " + databaseReference);
+            ((Listener) getActivity()).onFragmentViewCreated(this, mDataChildKey);
         }
-        Log.d(TAG, "onStart() called");
         setmyLayoutManager(mCurrentLayoutManagerType);
     }
 
@@ -173,39 +165,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
         super.onResume();
         if (mPresenter != null)
             mPresenter.start();
-    }
-
-    private void initQueryforFav() {
-        Query favquery = userRef.child(Constants.FIREBASE_LOCATION_USER_FAVORITE);
-        //favquery.addChildEventListener(favDataListener);
-        favquery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Log.i(TAG, "onDataChange: " + snapshot.getValue());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
-    private void initQueryforCart() {
-        Query favquery = userRef.child(Constants.FIREBASE_LOCATION_USER_CART);
-        favquery.addChildEventListener(cartDataListener);
-        favquery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("cartvalue", "we are done with loading cart");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
 
@@ -346,7 +305,7 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
                     }
                 };
                 query.addChildEventListener(childlistenerfordata);
-                initQueryforFav();
+                //initQueryforFav();
             }
     }
 
@@ -445,12 +404,17 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     }
 
     @Override
-    public void updateData(int adapterPosition, HairStyle hairStyle) {
+    public void showUpdatedData(int adapterPosition, HairStyle hairStyle) {
         adapterStyle.updateDataSet(adapterPosition, hairStyle);
     }
 
     @Override
-    public void setPresenter(@NonNull StylesDataContracts.Presenter presenter) {
+    public void showFavorites() {
+
+    }
+
+    @Override
+    public void setPresenter(@NonNull StylesDataContract.Presenter presenter) {
         mPresenter = presenter;
     }
 
@@ -470,7 +434,7 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
 
 
     public interface Listener {
-        void onFragmentViewCreated(StylesFragment stylesFragment, DatabaseReference dataRef);
+        void onFragmentViewCreated(StylesFragment stylesFragment, String dataRef);
 
         void onFragmentAttached(StylesFragment stylesFragment);
 

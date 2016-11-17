@@ -43,7 +43,7 @@
             android:paddingRight="8dp"
             android:background="?attr/selectableItemBackground"
 
-            app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
+            app:srcCompat="@drawable/ic_favorite_border_dribble_dark_24dp" />
 
         <Button
             android:id="@+id/cart"

@@ -18,7 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.auth.LoginSignUpActivity;
 import com.orca.dot.auth.ProfileDetailsActivity;
 import com.orca.dot.model.UserDetails;
-import com.orca.dot.services.StylesActivity;
+import com.orca.dot.services.styles.StylesActivity;
 import com.orca.dot.utils.Constants;
 
 /**

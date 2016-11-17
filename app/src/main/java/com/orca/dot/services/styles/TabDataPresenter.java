@@ -1,4 +1,4 @@
-package com.orca.dot.services.presenter;
+package com.orca.dot.services.styles;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -8,7 +8,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.model.KeyValue;
-import com.orca.dot.services.TabDataContracts;
 
 import java.util.ArrayList;
 
@@ -16,16 +15,16 @@ import java.util.ArrayList;
  * Created by amit on 27/10/16.
  */
 
-public class TabDataPresenter implements TabDataContracts.Presenter {
+public class TabDataPresenter implements TabDataContract.Presenter {
 
     private final DatabaseReference mDataReference;
-    private final TabDataContracts.View mDataView;
+    private final TabDataContract.View mDataView;
     private final ArrayList<KeyValue> mTabData;
     private ValueEventListener valueListener;
 
     private static final String TAG = "TabDataPresenter";
 
-    public TabDataPresenter(@NonNull DatabaseReference dataRef, @NonNull TabDataContracts.View dataView) {
+    public TabDataPresenter(@NonNull DatabaseReference dataRef, @NonNull TabDataContract.View dataView) {
         mDataReference = dataRef;
         mDataView = dataView;
         mTabData = new ArrayList<>();

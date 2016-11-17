@@ -14,30 +14,27 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Dot">
-
         <activity
             android:name=".welcome.WelcomeActivity"
-            android:theme="@style/AppTheme.Dot.Splash"></activity>
+            android:theme="@style/AppTheme.Dot.Splash" />
         <activity
-            android:name=".services.StylesActivity"
+            android:name=".services.styles.StylesActivity"
             android:theme="@style/AppTheme.Dot.Home" />
         <activity
             android:name=".auth.LoginSignUpActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Dot.Login" />
+            android:theme="@style/AppTheme.Dot.Login"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".auth.EnterOTP"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Dot.Login"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:screenOrientation="portrait"></activity>
-
-
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".auth.ProfileDetailsActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:screenOrientation="portrait" />
-        <activity android:name=".services.Favourite" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity android:name=".services.favorites.FavoritesActivity" />
         <activity android:name=".services.Cart" />
 
         <activity-alias
@@ -46,6 +43,7 @@
             android:targetActivity=".welcome.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
@@ -55,6 +53,8 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".ui.BaseActivity"></activity>
     </application>
 
 </manifest>

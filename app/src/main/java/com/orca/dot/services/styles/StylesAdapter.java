@@ -1,4 +1,4 @@
-package com.orca.dot.services.adapters;
+package com.orca.dot.services.styles;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.orca.dot.R;
 import com.orca.dot.model.HairStyle;
-import com.orca.dot.services.fragments.StylesFragment;
 import com.orca.dot.utils.Constants;
 
 import java.util.ArrayList;
@@ -75,7 +74,7 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
         } else {
             if (mCurrentViewType == GRID_ITEM)
                 holder.fav.setImageResource(R.drawable.ic_favorite_border_black_18dp);
-            else holder.fav.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            else holder.fav.setImageResource(R.drawable.ic_favorite_border_dribble_dark_24dp);
         }
 
 
@@ -95,7 +94,7 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
                 } else {
                     if (mCurrentViewType == GRID_ITEM)
                         holder.fav.setImageResource(R.drawable.ic_favorite_border_black_18dp);
-                    else holder.fav.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                    else holder.fav.setImageResource(R.drawable.ic_favorite_border_dribble_dark_24dp);
                 }
 
                 holder.numLikes.setText(String.valueOf(list.get(position).likesCount) + " Likes");
@@ -178,8 +177,8 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
                         hairStyle.likesCount = hairStyle.likesCount + 1;
                         hairStyle.likes.put(currentUserId, true);
                         if (mCurrentViewType == GRID_ITEM)
-                            fav.setImageResource(R.drawable.ic_favorite_border_black_18dp);
-                        else fav.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                            fav.setImageResource(R.drawable.ic_favorite_border_dribble_dark_24dp);
+                        else fav.setImageResource(R.drawable.ic_favorite_border_dribble_dark_24dp);
                     }
                     notifyItemChanged(position, Constants.LIKE_UPDATE);
                     ((StylesFragment) fragment).onFavClicked(list.get(getAdapterPosition()).uniqueKey, getAdapterPosition());

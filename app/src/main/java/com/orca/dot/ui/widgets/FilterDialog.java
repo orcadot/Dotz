@@ -1,4 +1,4 @@
-package com.orca.dot.services.widgets;
+package com.orca.dot.ui.widgets;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;

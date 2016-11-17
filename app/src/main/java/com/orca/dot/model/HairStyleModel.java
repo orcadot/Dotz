@@ -1,119 +1,63 @@
 package com.orca.dot.model;
 
-import org.json.JSONObject;
+import android.util.Log;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.orca.dot.BaseCallbacks;
+import com.orca.dot.BaseQuery;
+import com.orca.dot.services.styles.StylesDataPresenter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Defines the data structure for style object.
  *
  * @author Amit on 08-06-2016.
  */
-public class HairStyleModel {
+public class HairStyleModel{
 
-    private String expertInfo;
-    private String faceCut;
-    private String fileUrl;
-    private String gender;
-    private String length;
-    private int likes;
-    private String name;
-    private int type;
-    private JSONObject price;
+    private DatabaseReference databaseReference;
+    private BaseQuery mBaseQuery;
+    private List<HairStyle> hairStylesList;
+    private StylesDataPresenter stylesDataPresenter;
 
+    private static final String TAG = "HairStyleModel";
     /**
      * Required public constructor
      */
-    public HairStyleModel() {
+    public HairStyleModel(DatabaseReference databaseReference, StylesDataPresenter stylesDataPresenter) {
+        this.databaseReference = databaseReference;
+        this.hairStylesList = new ArrayList<>();
+        this.stylesDataPresenter = stylesDataPresenter;
     }
 
-    /**
-     * Use this constructor to create new StyleObject.
-     * Takes different params
-     *
-     * @param expertInfo
-     * @param faceCut
-     * @param likes
-     * @param type
-     * @param fileUrl
-     * @param gender
-     * @param length
-     * @param likes
-     * @param name
-     * @param price
-     */
+    public void getHairStyles(){
+        hairStylesList.clear();
+        mBaseQuery = new BaseQuery(databaseReference, new BaseCallbacks() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if (snapshot.getValue() != null) {
+                        HairStyle hairStyle = snapshot.getValue(HairStyle.class);
+                        hairStyle.uniqueKey = snapshot.getKey();
+                        hairStylesList.add(hairStyle);
+                    }
+                }
+                stylesDataPresenter.updateData(hairStylesList);
+            }
 
-    public HairStyleModel(String expertInfo, String faceCut, String fileUrl, String gender, String length,
-                          int likes, String name, int type, JSONObject price) {
-        this.expertInfo = expertInfo;
-        this.faceCut = faceCut;
-        this.fileUrl = fileUrl;
-        this.gender = gender;
-        this.length = length;
-        this.likes = likes;
-        this.name = name;
-        this.type = type;
-        this.price = price;
+            @Override
+            public void onError(String message) {
+                Log.d(TAG, "onError() called with: message = [" + message + "]");
+            }
+        });
+        mBaseQuery.getDataSnapshot();
     }
 
-    /**
-     * @return expertInfo
-     */
-    public String getExpertInfo() {
-        return expertInfo;
+    public void removeListener(){
+        mBaseQuery.stopListening();
     }
 
-    /**
-     * @return faceCut
-     */
-    public String getFaceCut() {
-        return faceCut;
-    }
-
-    /**
-     * @return fileUrl
-     */
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    /**
-     * @return gender
-     */
-    public String getGender() {
-        return gender;
-    }
-
-    /**
-     * @return Length
-     */
-    public String getLength() {
-        return length;
-    }
-
-    /**
-     * @return likes
-     */
-    public int getLikes() {
-        return likes;
-    }
-
-    /**
-     * @return Name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return type
-     */
-    public int getType() {
-        return type;
-    }
-
-    /**
-     * @return price
-     */
-    public JSONObject getPrice() {
-        return price;
-    }
 }
