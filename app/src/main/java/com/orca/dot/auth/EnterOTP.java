@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -36,6 +37,7 @@ import com.orca.dot.auth.internal.OTPVerification;
 import com.orca.dot.model.UserDetails;
 import com.orca.dot.services.styles.StylesActivity;
 import com.orca.dot.utils.Constants;
+import com.orca.dot.welcome.WelcomeActivity;
 
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener {
 
@@ -131,34 +133,31 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
 
     private void updateUI(FirebaseUser user) {
         mDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_LOCATION_USER_LISTS).child(user.getUid());
-        mDatabase.keepSynced(true);
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange() called with: dataSnapshot = [" + dataSnapshot + "]");
+                if (progressDialog != null)
+                    progressDialog.dismiss();
+
                 if (dataSnapshot.getValue() == null) {
                     Intent intent = new Intent(EnterOTP.this, ProfileDetailsActivity.class);
-                    intent.putExtra("FRAGMENT_ID", Constants.FRAGMENT_PROFILE_DETAILS);
                     startActivity(intent);
                     finish();
                 } else {
                     UserDetails userDetails = dataSnapshot.getValue(UserDetails.class);
-                    if (userDetails.isFCTFilled) {
-                        Log.i(TAG, "onDataChange: " + userDetails.username);
-                        Intent intent = new Intent(EnterOTP.this, StylesActivity.class);
-                        intent.putExtra(Constants.USER_NAME_KEY, userDetails.username);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Intent intent = new Intent(EnterOTP.this, ProfileDetailsActivity.class);
-                        intent.putExtra("FRAGMENT_ID", Constants.FRAGMENT_FACECUT);
-                        startActivity(intent);
-                        finish();
-                    }
+
+                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.profile_prefs_file_key), MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(getString(R.string.profile_filled), true);
+                    editor.putString(getString(R.string.profile_user_name), userDetails.username);
+                    editor.apply();
+
+                    Intent intent = new Intent(EnterOTP.this, StylesActivity.class);
+                    intent.putExtra(Constants.USER_NAME_KEY, userDetails.username);
+                    startActivity(intent);
+                    finish();
                 }
 
-                if (progressDialog != null)
-                    progressDialog.dismiss();
             }
 
             @Override
@@ -166,17 +165,17 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                 Toast.makeText(EnterOTP.this, "Failed to load user details.",
                         Toast.LENGTH_SHORT).show();
+
                 if (progressDialog != null)
                     progressDialog.dismiss();
+
+                Intent intent = new Intent(EnterOTP.this, WelcomeActivity.class);
+                startActivity(intent);
             }
-
-
         };
 
         mDatabase.addValueEventListener(valueEventListener);
-
         mListener = valueEventListener;
-
 
     }
 
@@ -189,21 +188,24 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
             @Override
             public void otpVerificationFailure(String error) {
                 isVerifying = false;
-                Snackbar.make(verifyBtn, error, Snackbar.LENGTH_LONG)
-                        .show();
+                Snackbar.make(verifyBtn, error, Snackbar.LENGTH_LONG).show();
                 if (progressDialog != null) {
                     progressDialog.dismiss();
                 }
-
             }
 
             @Override
             public void otpVerificationSuccess(String token) {
+
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.profile_prefs_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString(getString(R.string.phone_number), phone);
+                editor.commit();
+
                 createFirebaseUser(token);
-                Log.d("TOKEN", token);
+
                 progressDialog.setMessage("Setting your account");
                 isVerifying = false;
-
             }
         });
     }
@@ -213,10 +215,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCustomToken:onComplete:" + task.isSuccessful());
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCustomToken", task.getException());
-
                             if (progressDialog != null) {
                                 progressDialog.dismiss();
                             }
@@ -227,6 +226,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
+
                 });
     }
 

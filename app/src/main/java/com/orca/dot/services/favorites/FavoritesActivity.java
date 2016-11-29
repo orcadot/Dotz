@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 import com.orca.dot.R;
 import com.orca.dot.model.BaseModel;
-import com.orca.dot.model.HairStyle;
+import com.orca.dot.model.Style;
 import com.orca.dot.ui.BaseActivity;
 
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ import java.util.List;
 public class FavoritesActivity extends BaseActivity implements FavoritesContract.View {
 
     private FavoritesContract.Presenter mPresenter;
-    private ArrayList<HairStyle> arrayList = new ArrayList<>();
+    private ArrayList<Style> arrayList = new ArrayList<>();
     private RecyclerView recyclerView;
     private FavoritesAdapter adapter;
     private GridLayoutManager layoutManager;
 
-    private static final String TAG = "FavoritesActivity";
+    private static final String TAG = "CartActivity";
 
 
 

@@ -10,8 +10,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-import com.orca.dot.model.HairStyle;
-import com.orca.dot.model.HairStyleModel;
+import com.orca.dot.model.Style;
+import com.orca.dot.model.StyleModel;
 import com.orca.dot.utils.Constants;
 
 import java.util.ArrayList;
@@ -25,19 +25,22 @@ public class StylesDataPresenter implements StylesDataContract.Presenter {
     private static final String TAG = "StylesDataPresenter";
     private final DatabaseReference mDataReference;
     private final DatabaseReference mUserLikesReference;
-    private final String dataNode;
-    private final StylesDataContract.View mDataView;
-    private List<HairStyle> mStylesData;
-    private ValueEventListener valueListener;
-    private HairStyleModel mHairStyleModel;
 
-    StylesDataPresenter(@NonNull String dataRef, @NonNull StylesDataContract.View dataView) {
-        dataNode = dataRef;
-        mDataReference = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_STYLE_DATA_NODE).child(dataNode);
+    private final StylesDataContract.View mDataView;
+    private final DatabaseReference mUserAddReference;
+    private List<Style> mStylesData;
+    private ValueEventListener valueListener;
+    private StyleModel mStylesModel;
+    private String categoryId;
+
+    StylesDataPresenter(@NonNull DatabaseReference dataRef, @NonNull StylesDataContract.View dataView){
+        mDataReference = dataRef;
         mUserLikesReference = FirebaseDatabase.getInstance().getReference().child("user-likes").child(getUid());
+        mUserAddReference = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_LOCATION_USER_LISTS).child(getUid()).child("adds");
         mDataView = dataView;
         mStylesData = new ArrayList<>();
         dataView.setPresenter(this);
+
     }
 
     @Override
@@ -47,31 +50,29 @@ public class StylesDataPresenter implements StylesDataContract.Presenter {
 
     @Override
     public void favClicked(final String styleRef, final int adapterPosition) {
-        Log.d(TAG, "favClicked() called with: styleRef = [" +mDataReference.child(styleRef) + "], adapterPosition = [" + adapterPosition + "]");
+       /* Log.d(TAG, "favClicked() called with: styleRef = [" +mDataReference.child(styleRef) + "], adapterPosition = [" + adapterPosition + "]");
         mDataReference.child(styleRef).runTransaction(new Transaction.Handler() {
             boolean mLiked;
-
-
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
-                HairStyle hairStyle = mutableData.getValue(HairStyle.class);
-                if (hairStyle == null) {
+                Style style = mutableData.getValue(Style.class);
+                if (style == null) {
                     return Transaction.success(mutableData);
                 }
 
-                if (hairStyle.likes.containsKey(getUid())) {
-                    hairStyle.likesCount = hairStyle.likesCount - 1;
-                    hairStyle.likes.remove(getUid());
+                if (style.likes.containsKey(getUid())) {
+                    style.likesCount = style.likesCount - 1;
+                    style.likes.remove(getUid());
                     mLiked = false;
                 } else {
 
-                    hairStyle.likesCount = hairStyle.likesCount + 1;
-                    hairStyle.likes.put(getUid(), true);
+                    style.likesCount = style.likesCount + 1;
+                    style.likes.put(getUid(), true);
                     mLiked = true;
                 }
 
                 Log.d(TAG, "doTransaction() called with: mutableData = [" + mutableData + "]");
-                mutableData.setValue(hairStyle);
+                mutableData.setValue(style);
                 return Transaction.success(mutableData);
             }
 
@@ -79,46 +80,62 @@ public class StylesDataPresenter implements StylesDataContract.Presenter {
             public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                 if (databaseError == null) {
                     Log.d(TAG, "onComplete() called with: databaseError = [" + databaseError + "], b = [" + b + "], dataSnapshot = [" + dataSnapshot + "]");
-                    HairStyle hairStyle = dataSnapshot.getValue(HairStyle.class);
-                    updateToUserRef(hairStyle, styleRef, mLiked);
-                    mDataView.showUpdatedData(adapterPosition, hairStyle);
+                    Style style = dataSnapshot.getValue(Style.class);
+                    updateToUserRef(style, styleRef, mLiked);
+                    mDataView.showUpdatedData(adapterPosition, style);
                 }
                 else
                     Log.i(TAG, "onComplete: "+databaseError);
+            }
+        });*/
+    }
+
+    @Override
+    public void loadFavorites(String favoritesRef) {
+    }
+
+
+    private void updateToUserRef(Style style, String styleRef, boolean mLiked) {
+        if (!mLiked) {
+            //mUserLikesReference.child(dataNode).child(styleRef).removeValue();
+        }
+            //mUserLikesReference.child(dataNode).child(styleRef).setValue(style);
+    }
+
+    @Override
+    public void addClicked(String styleRef, int adapterPosition) {
+        mUserAddReference.child(styleRef).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onComplete() called with: databaseError = [" + databaseError + "], b = [" + b + "], dataSnapshot = [" + dataSnapshot + "]");
             }
         });
     }
 
     @Override
-    public void loadFavorites(String favoritesRef) {
-
-    }
-
-    private void updateToUserRef(HairStyle hairStyle, String styleRef, boolean mLiked) {
-        if (!mLiked) {
-            mUserLikesReference.child(dataNode).child(styleRef).removeValue();
-        } else
-            mUserLikesReference.child(dataNode).child(styleRef).setValue(hairStyle);
-    }
-
-    @Override
     public void start() {
-        mHairStyleModel = new HairStyleModel(mDataReference, this);
-        mHairStyleModel.getHairStyles();
-
+        mStylesModel = new StyleModel(mDataReference, this);
+        mStylesModel.getStyles();
     }
 
     @Override
     public void stop() {
-       mHairStyleModel.removeListener();
+       mStylesModel.removeListener();
     }
 
 
-    public void updateData(List<HairStyle> hairStylesList) {
-        if((hairStylesList != null) && (!hairStylesList.isEmpty())){
-            mDataView.showStylesData(hairStylesList);
+    public void updateData(List<Style> stylesList) {
+        if((stylesList != null) && (!stylesList.isEmpty())){
+            mDataView.showStylesData(stylesList);
         }
         else
             Log.i(TAG, "start: hairstyles empty");
     }
+
+
 }

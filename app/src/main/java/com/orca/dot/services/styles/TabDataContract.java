@@ -1,8 +1,11 @@
 package com.orca.dot.services.styles;
 
+import android.support.v4.media.RatingCompat;
+
 import com.orca.dot.BasePresenter;
 import com.orca.dot.BaseView;
 import com.orca.dot.model.KeyValue;
+import com.orca.dot.model.StyleCategory;
 
 import java.util.List;
 
@@ -12,8 +15,8 @@ import java.util.List;
 
 public interface TabDataContract {
 
-    interface View extends BaseView<Presenter> {
-        void populateTabData(List<KeyValue> tabData);
+    interface View extends BaseView<TabDataContract.Presenter> {
+        void populateTabData(List<StyleCategory> tabData);
     }
 
     interface Presenter extends BasePresenter {

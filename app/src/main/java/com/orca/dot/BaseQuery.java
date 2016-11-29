@@ -27,7 +27,6 @@ public class BaseQuery {
     }
 
     public void getDataSnapshot(){
-
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

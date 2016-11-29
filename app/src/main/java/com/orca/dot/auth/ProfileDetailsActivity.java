@@ -1,7 +1,9 @@
 package com.orca.dot.auth;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -32,80 +34,68 @@ public class ProfileDetailsActivity extends AppCompatActivity implements Profile
     private Fragment fragment;
     private FirebaseUser currentUser;
     private ProgressDialog progressDialog;
-
+    private UserDetails userDetails;
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_profile_details);
-        if (getIntent().getIntExtra("FRAGMENT_ID", 0) == Constants.FRAGMENT_PROFILE_DETAILS)
-            fragment = ProfileDetailsFragment.newInstance();
-        else
-            fragment = FacecutDetectFragment.newInstance();
-
-
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        fragment = ProfileDetailsFragment.newInstance();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.content_fragment, fragment);
         fragmentTransaction.commit();
-        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
-
     }
 
 
     @Override
     public void onProfileSave(UserDetails userDetails) {
         hideSoftKeyBoard();
-        if (currentUser != null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Saving your details");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference databaseReference = database.getReference();
-            databaseReference.child("Users").child(currentUser.getUid()).setValue(userDetails, new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError == null) {
-                        fragment = FacecutDetectFragment.newInstance();
-                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                        fragmentTransaction.addToBackStack(null);
-                        fragmentTransaction.replace(R.id.content_fragment, fragment);
-                        fragmentTransaction.commit();
-                        progressDialog.dismiss();
-                    } else
-                        Snackbar.make(fragment.getView(), databaseError.getMessage(), Snackbar.LENGTH_LONG).show();
-                }
-            });
-        }
+        this.userDetails = userDetails;
+        fragment = FacecutDetectFragment.newInstance();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.content_fragment, fragment);
+        fragmentTransaction.commit();
     }
 
     @Override
     public void onFacecutSelect(int facecut, String fct) {
-        hideSoftKeyBoard();
+        // hideSoftKeyBoard();
         if (currentUser != null) {
+
             progressDialog = new ProgressDialog(this);
             progressDialog.setMessage("Saving your facecut");
             progressDialog.setCancelable(false);
             progressDialog.show();
-            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference databaseReference = database.getReference();
 
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("facecut", fct);
-            updates.put("facecut_type", facecut);
-            updates.put("isFCTFilled", true);
+            sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.profile_prefs_file_key), Context.MODE_PRIVATE);
+            userDetails.phone = sharedPref.getString(getString(R.string.phone_number), "");
+            userDetails.facecut = fct;
+            userDetails.facecut_type = facecut;
 
-            databaseReference.child(Constants.FIREBASE_LOCATION_USER_LISTS + "/" + currentUser.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
+            databaseReference.child(Constants.FIREBASE_LOCATION_USER_LISTS + "/" + currentUser.getUid()).setValue(userDetails, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     if (databaseError == null) {
-                        startActivity(new Intent(ProfileDetailsActivity.this, StylesActivity.class));
+                        sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.profile_prefs_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putBoolean(getString(R.string.profile_filled), true);
+                        editor.putString(getString(R.string.profile_user_name), userDetails.username);
+                        editor.apply();
+
+                        Intent intent = new Intent(ProfileDetailsActivity.this, StylesActivity.class);
+                        intent.putExtra(Constants.USER_NAME_KEY, userDetails.username);
+                        startActivity(intent);
                         progressDialog.dismiss();
                         finish();
+
                     } else
                         Snackbar.make(fragment.getView(), databaseError.getMessage(), Snackbar.LENGTH_LONG).show();
                 }
@@ -116,7 +106,6 @@ public class ProfileDetailsActivity extends AppCompatActivity implements Profile
 
     private void hideSoftKeyBoard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-
         if (imm.isAcceptingText()) {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }

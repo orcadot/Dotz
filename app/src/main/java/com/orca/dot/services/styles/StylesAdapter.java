@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.orca.dot.R;
-import com.orca.dot.model.HairStyle;
+import com.orca.dot.model.Style;
 import com.orca.dot.utils.Constants;
 
 import java.util.ArrayList;
@@ -31,12 +31,12 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
     private static final String TAG = "StylesAdapter";
     private final int SET_CART = 1;
     private Context context;
-    private List<HairStyle> list = new ArrayList<>();
+    private List<Style> list = new ArrayList<>();
     private int mCurrentViewType = GRID_ITEM;
     private Fragment fragment;
     private String currentUserId;
 
-    public StylesAdapter(Context context, StylesFragment.LayoutManagerType mCurrentLayoutManagerType, List<HairStyle> list, String uid, Fragment fragment) {
+    public StylesAdapter(Context context, StylesFragment.LayoutManagerType mCurrentLayoutManagerType, List<Style> list, String uid, Fragment fragment) {
         this.context = context;
         if (mCurrentLayoutManagerType == StylesFragment.LayoutManagerType.GRID_LAYOUT_MANAGER)
             mCurrentViewType = GRID_ITEM;
@@ -60,28 +60,21 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (!list.get(position).Image.isEmpty())
-            Glide.with(context).load(list.get(position).Image).into(holder.mImageView);
+        if (!list.get(position).style_image.isEmpty())
+            Glide.with(context).load(list.get(position).style_image).into(holder.mImageView);
 
-        if (!list.get(position).Name.isEmpty())
-            holder.mTextView.setText(list.get(position).Name);
+        if (!list.get(position).style_name.isEmpty())
+            holder.mTextView.setText(list.get(position).style_name);
 
-        if (list.get(position).likes.containsKey(currentUserId)) {
-            if (mCurrentViewType == GRID_ITEM)
-                holder.fav.setImageResource(R.drawable.ic_favorite_red_18dp);
-            else holder.fav.setImageResource(R.drawable.ic_favorite_red_24dp);
-
-        } else {
             if (mCurrentViewType == GRID_ITEM)
                 holder.fav.setImageResource(R.drawable.ic_favorite_border_black_18dp);
             else holder.fav.setImageResource(R.drawable.ic_favorite_border_dribble_dark_24dp);
-        }
 
 
-        holder.numLikes.setText(String.valueOf(list.get(position).likesCount) + " Likes");
+        holder.numLikes.setText(String.valueOf( " Likes"));
     }
 
-    @Override
+   /* @Override
     public void onBindViewHolder(ViewHolder holder, int position, List<Object> payloads) {
 
         if (!payloads.isEmpty()) {
@@ -101,7 +94,7 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
             }
         } else
             super.onBindViewHolder(holder, position, payloads);
-    }
+    }*/
 
     @Override
     public int getItemCount() {
@@ -123,7 +116,7 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
         }
     }
 
-    public void add(HairStyle value) {
+    public void add(Style value) {
         list.add(value);
         notifyItemInserted(list.size() - 1);
     }
@@ -133,14 +126,14 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
-    public void updateDataSet(int adapterPosition, HairStyle hairStyle) {
-        if (hairStyle.likesCount != list.get(adapterPosition).likesCount) {
-            list.get(adapterPosition).likesCount = hairStyle.likesCount;
-            list.get(adapterPosition).likes = hairStyle.likes;
+   /* public void updateDataSet(int adapterPosition, Style style) {
+        if (style.likesCount != list.get(adapterPosition).likesCount) {
+            list.get(adapterPosition).likesCount = style.likesCount;
+            list.get(adapterPosition).likes = style.likes;
             notifyItemChanged(adapterPosition, Constants.LIKE_UPDATE);
         }
 
-    }
+    }*/
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView fav;
@@ -165,29 +158,31 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
                 @Override
                 public void onClick(View v) {
                     final int position = getAdapterPosition();
-                    HairStyle hairStyle = list.get(position);
-                    Log.i(TAG, "onClick: " + hairStyle.Name);
-                    if (hairStyle.likes.containsKey(currentUserId)) {
-                        hairStyle.likesCount = hairStyle.likesCount - 1;
-                        hairStyle.likes.remove(currentUserId);
+                    Style style = list.get(position);
+
+      /*              if (style.likes.containsKey(currentUserId)) {
+                        style.likesCount = style.likesCount - 1;
+                        style.likes.remove(currentUserId);
                         if (mCurrentViewType == GRID_ITEM)
                             fav.setImageResource(R.drawable.ic_favorite_red_18dp);
                         else fav.setImageResource(R.drawable.ic_favorite_red_24dp);
                     } else {
-                        hairStyle.likesCount = hairStyle.likesCount + 1;
-                        hairStyle.likes.put(currentUserId, true);
+                        style.likesCount = style.likesCount + 1;
+                        style.likes.put(currentUserId, true);
                         if (mCurrentViewType == GRID_ITEM)
                             fav.setImageResource(R.drawable.ic_favorite_border_dribble_dark_24dp);
                         else fav.setImageResource(R.drawable.ic_favorite_border_dribble_dark_24dp);
                     }
                     notifyItemChanged(position, Constants.LIKE_UPDATE);
-                    ((StylesFragment) fragment).onFavClicked(list.get(getAdapterPosition()).uniqueKey, getAdapterPosition());
+                    ((StylesFragment) fragment).onFavClicked(list.get(position).uniqueKey, getAdapterPosition());*/
 
                 }
             });
             cart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    final int position = getAdapterPosition();
+                   // ((StylesFragment) fragment).onAddClicked(list.get(position).uniqueKey, getAdapterPosition());
                 }
             });
 

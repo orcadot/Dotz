@@ -25,6 +25,8 @@
     <string name="action_fav">Favorite</string>
     <string name="action_search">Search</string>
     <string name="action_layout">ListView</string>
+    <string name="phone_number">phone_number_pref_key</string>
+    <string name="profile_user_name">PROFILE_USER_NAME</string>
 
     <string-array name="fct_array">
         <item>Diamond</item>

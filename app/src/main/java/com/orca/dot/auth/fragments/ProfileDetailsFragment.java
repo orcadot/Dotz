@@ -115,10 +115,12 @@ public class ProfileDetailsFragment extends Fragment {
                 EmailValidator emailValidator = new EmailValidator();
                 String email = emailEditText.getText().toString().trim();
                 String name = nameEditText.getText().toString().trim();
-                if (!emailValidator.validate(email))
+                if (name.isEmpty()) {
+                    Snackbar.make(v, "Name is empty.", Snackbar.LENGTH_LONG).show();
+                } else if (!emailValidator.validate(email))
                     Snackbar.make(v, "Email is not valid", Snackbar.LENGTH_LONG).show();
                 else
-                    saveProfile(new UserDetails(name, email, mGender, mGenderCode, true, false));
+                    saveProfile(new UserDetails(name, email, mGender, mGenderCode));
 
             }
         });

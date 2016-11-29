@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.orca.dot.R;
 import com.orca.dot.model.BaseModel;
-import com.orca.dot.model.HairStyle;
+import com.orca.dot.model.Style;
 import com.orca.dot.model.Header;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private final LayoutInflater layoutInflater;
     private List<BaseModel> items;
 
-    private static final String TAG = "FavoritesAdapter";
+    private static final String TAG = "CartAdapter";
 
     public FavoritesAdapter(Context context) {
         this.context = context;
@@ -62,7 +62,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 bindHeader((Header) getItem(position), (HeaderHolder) holder);
                 break;
             case TYPE_STYLE:
-                bindStyle((HairStyle) getItem(position), (StyleViewHolder) holder);
+                bindStyle((Style) getItem(position), (StyleViewHolder) holder);
                 break;
         }
     }
@@ -73,19 +73,15 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return holder;
     }
 
-    private void bindStyle(HairStyle hairStyle, StyleViewHolder holder) {
-        if (!hairStyle.Image.isEmpty())
-            Glide.with(context).load(hairStyle.Image).into(holder.mImageView);
+    private void bindStyle(Style style, StyleViewHolder holder) {
+        if (!style.style_image.isEmpty())
+            Glide.with(context).load(style.style_image).into(holder.mImageView);
 
-        if (!hairStyle.Name.isEmpty())
-            holder.mTextView.setText(hairStyle.Name);
+        if (!style.style_name.isEmpty())
+            holder.mTextView.setText(style.style_name);
 
-        if (hairStyle.likes.containsKey(getUid())) {
-            holder.fav.setImageResource(R.drawable.ic_favorite_red_18dp);
 
-        } else
-            holder.fav.setImageResource(R.drawable.ic_favorite_border_black_18dp);
-        holder.numLikes.setText(String.valueOf(hairStyle.likesCount) + " Likes");
+        holder.numLikes.setText(String.valueOf(" Likes"));
     }
 
 
@@ -109,7 +105,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public int getItemViewType(int position) {
         BaseModel model = getItem(position);
-        if (model instanceof HairStyle)
+        if (model instanceof Style)
             return TYPE_STYLE;
         else if (model instanceof Header)
             return TYPE_HEADER;

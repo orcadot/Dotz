@@ -28,9 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.orca.dot.BasePresenter;
 import com.orca.dot.R;
-import com.orca.dot.model.HairStyle;
-import com.orca.dot.services.Cart;
+import com.orca.dot.model.Style;
 import com.orca.dot.ui.widgets.FilterDialog;
 import com.orca.dot.utils.Constants;
 
@@ -59,28 +59,26 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     private TextView cart;
     private TextView filterBar;
     private TextView filterBarClear;
-    private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference userRef = database.getReference(Constants.FIREBASE_LOCATION_USER_LISTS).child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private ChildEventListener favDataListener;
     private ChildEventListener styleDataListener;
     private ChildEventListener childlistenerfordata;
     private ValueEventListener valueListener;
     private ChildEventListener cartDataListener;
 
-    //My Variables
     private StylesDataContract.Presenter mPresenter;
     private String mDataChildKey;
+    private String categoryId;
 
 
     public StylesFragment() {
 
     }
 
-    public static StylesFragment newInstance(String refKey) {
-        Bundle args = new Bundle();
-        args.putString("data_reference_key", refKey);
+    public static StylesFragment newInstance(String category_id) {
         StylesFragment fragment = new StylesFragment();
+        Bundle args = new Bundle();
+        args.putString("CATEGORY_ID", category_id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -88,8 +86,9 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDataChildKey = getArguments().getString("data_reference_key");
-        databaseReference = database.getReference(Constants.FIREBASE_STYLE_DATA_NODE).child(mDataChildKey);
+        if (getArguments() != null) {
+            categoryId = getArguments().getString("CATEGORY_ID");
+        }
     }
 
     @Nullable
@@ -121,7 +120,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
         cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mContext, Cart.class));
             }
         });
 
@@ -140,9 +138,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (getActivity() instanceof Listener) {
-            ((Listener) getActivity()).onFragmentAttached(this);
-        }
     }
 
     @Override
@@ -154,9 +149,7 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     @Override
     public void onStart() {
         super.onStart();
-        if (getActivity() instanceof Listener) {
-            ((Listener) getActivity()).onFragmentViewCreated(this, mDataChildKey);
-        }
+        new StylesDataPresenter(databaseReference.child("styles").child(categoryId), this);
         setmyLayoutManager(mCurrentLayoutManagerType);
     }
 
@@ -277,9 +270,9 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         if (!dataSnapshot.getValue().toString().isEmpty()) {
 
-                            HairStyle hairStyle = dataSnapshot.getValue(HairStyle.class);
-                            // hairStyle.setLiked(liked);
-                            adapterStyle.add(hairStyle);
+                            Style style = dataSnapshot.getValue(Style.class);
+                            // style.setLiked(liked);
+                            adapterStyle.add(style);
 
                         }
                     }
@@ -368,9 +361,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     @Override
     public void onDetach() {
         super.onDetach();
-        if (getActivity() instanceof Listener) {
-            ((Listener) getActivity()).onFragmentDetached(this);
-        }
 
     }
 
@@ -398,19 +388,18 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     }
 
     @Override
-    public void showStylesData(List<HairStyle> dataList) {
+    public void showStylesData(List<Style> dataList) {
         adapterStyle = new StylesAdapter(mContext, mCurrentLayoutManagerType, dataList, getUid(), this);
         recyclerView.setAdapter(adapterStyle);
     }
 
     @Override
-    public void showUpdatedData(int adapterPosition, HairStyle hairStyle) {
-        adapterStyle.updateDataSet(adapterPosition, hairStyle);
+    public void showUpdatedData(int adapterPosition, Style style) {
+        // adapterStyle.updateDataSet(adapterPosition, style);
     }
 
     @Override
     public void showFavorites() {
-
     }
 
     @Override
@@ -427,18 +416,13 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
         mPresenter.favClicked(styleKey, adapterPosition);
     }
 
+    public void onAddClicked(String uniqueKey, int adapterPosition) {
+        mPresenter.addClicked(uniqueKey, adapterPosition);
+    }
+
     public enum LayoutManagerType {
         GRID_LAYOUT_MANAGER,
         LINEAR_LAYOUT_MANAGER
-    }
-
-
-    public interface Listener {
-        void onFragmentViewCreated(StylesFragment stylesFragment, String dataRef);
-
-        void onFragmentAttached(StylesFragment stylesFragment);
-
-        void onFragmentDetached(StylesFragment stylesFragment);
     }
 
 }

@@ -8,6 +8,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.model.KeyValue;
+import com.orca.dot.model.StyleCategory;
 
 import java.util.ArrayList;
 
@@ -19,7 +20,7 @@ public class TabDataPresenter implements TabDataContract.Presenter {
 
     private final DatabaseReference mDataReference;
     private final TabDataContract.View mDataView;
-    private final ArrayList<KeyValue> mTabData;
+    private final ArrayList<StyleCategory> mTabData;
     private ValueEventListener valueListener;
 
     private static final String TAG = "TabDataPresenter";
@@ -40,8 +41,8 @@ public class TabDataPresenter implements TabDataContract.Presenter {
                 Log.d(TAG, "onDataChange() called with: dataSnapshot = [" + dataSnapshot + "]");
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     if (snapshot.getValue() != null) {
-                        KeyValue keyValue = snapshot.getValue(KeyValue.class);
-                        mTabData.add(keyValue);
+                        StyleCategory styleCategory = snapshot.getValue(StyleCategory.class);
+                        mTabData.add(styleCategory);
                     }
                 }
                 mDataView.populateTabData(mTabData);
@@ -51,8 +52,7 @@ public class TabDataPresenter implements TabDataContract.Presenter {
             public void onCancelled(DatabaseError databaseError) {
             }
         };
-        mDataReference.keepSynced(true);
-        mDataReference.addValueEventListener(valueListener);
+        mDataReference.addListenerForSingleValueEvent(valueListener);
     }
 
     @Override

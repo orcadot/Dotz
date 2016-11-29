@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
@@ -22,31 +21,37 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.orca.dot.BasePresenter;
 import com.orca.dot.R;
-import com.orca.dot.model.KeyValue;
-import com.orca.dot.services.Cart;
+import com.orca.dot.model.Style;
+import com.orca.dot.model.StyleCategory;
 import com.orca.dot.services.favorites.FavoritesActivity;
 import com.orca.dot.ui.BaseActivity;
 import com.orca.dot.utils.Constants;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A StylesActivity contains home screen for showing services and products.
  */
-public class StylesActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, StylesFragment.Listener, TabDataContract.View {
+public class StylesActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, TabDataContract.View {
 
-    private static final String TAG = "StylesActivity";
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private String userName;
     private ViewPagerAdapter adapter;
     private DrawerLayout drawer;
+    private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
     private TabDataContract.Presenter mTabDataPresenter;
+    private static final String TAG = "StylesActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +63,13 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
             userName = getIntent().getStringExtra(Constants.USER_NAME_KEY);
 
         setContentView(R.layout.activity_home);
-
         initializeUI();
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         assert viewPager != null;
         viewPager.setOffscreenPageLimit(2);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
-        new TabDataPresenter(FirebaseDatabase.getInstance().getReference().child("services_keys"), this);
-        mTabDataPresenter.start();
+        new TabDataPresenter(databaseReference.child("categories"), this);
 
     }
 
@@ -93,7 +96,7 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
     }
 
 
-    private void setupViewPager(ViewPager viewPager, List<KeyValue> tabData) {
+    private void setupViewPager(ViewPager viewPager, List<StyleCategory> tabData) {
         adapter = new ViewPagerAdapter(getSupportFragmentManager(), tabData);
         viewPager.setAdapter(adapter);
     }
@@ -101,6 +104,13 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
     @Override
     protected void onStart() {
         super.onStart();
+        mTabDataPresenter.start();
+        Log.d(TAG, "onStart() called");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -127,7 +137,6 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
                     ((StylesFragment) fragment).setLayoutManagerNow();
                 break;
             case R.id.action_cart:
-                startActivity(new Intent(StylesActivity.this, Cart.class));
                 break;
             case R.id.action_fav:
                 startActivity(new Intent(StylesActivity.this, FavoritesActivity.class));
@@ -151,29 +160,14 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
         return true;
     }
 
-    @Override
-    public void onFragmentViewCreated(StylesFragment stylesFragment, String dataRef) {
-        Log.d(TAG, "onFragmentViewCreated() called with: stylesFragment = [" + stylesFragment + "], dataRef = [" + dataRef + "]");
-        new StylesDataPresenter(dataRef, stylesFragment);
-    }
-
-    @Override
-    public void onFragmentAttached(StylesFragment stylesFragment) {
-
-    }
-
-    @Override
-    public void onFragmentDetached(StylesFragment stylesFragment) {
-
-    }
 
     @Override
     public void setPresenter(TabDataContract.Presenter presenter) {
-        mTabDataPresenter = presenter;
+            mTabDataPresenter = presenter;
     }
 
     @Override
-    public void populateTabData(List<KeyValue> tabData) {
+    public void populateTabData(List<StyleCategory> tabData) {
         setupViewPager(viewPager, tabData);
         tabLayout.setupWithViewPager(viewPager);
     }
@@ -181,16 +175,16 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
 
     static class ViewPagerAdapter extends FragmentStatePagerAdapter {
         private final SparseArray<WeakReference<Fragment>> instantiatedFragments = new SparseArray<>();
-        private List<KeyValue> tabsData = new ArrayList<>();
+        private List<StyleCategory> tabsData = new ArrayList<>();
 
-        ViewPagerAdapter(FragmentManager fm, List<KeyValue> tabData) {
+        ViewPagerAdapter(FragmentManager fm, List<StyleCategory> tabData) {
             super(fm);
             this.tabsData = tabData;
         }
 
         @Override
         public Fragment getItem(int position) {
-            return StylesFragment.newInstance(tabsData.get(position).key);
+            return StylesFragment.newInstance(tabsData.get(position).category_id);
         }
 
         @Override
@@ -200,7 +194,7 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return tabsData.get(position).value;
+            return tabsData.get(position).category_name;
         }
 
         @Override

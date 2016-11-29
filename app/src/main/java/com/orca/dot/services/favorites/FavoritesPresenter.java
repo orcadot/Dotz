@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.model.BaseModel;
-import com.orca.dot.model.HairStyle;
+import com.orca.dot.model.Style;
 import com.orca.dot.model.Header;
 import com.orca.dot.utils.Providers;
 
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class FavoritesPresenter implements FavoritesContract.Presenter {
 
-    private static final String TAG = "FavoritesPresenter";
+    private static final String TAG = "CartPresenter";
     private final DatabaseReference mFavReference;
     private final FavoritesContract.View mFavView;
     private ValueEventListener valueEventListener;
@@ -50,8 +50,8 @@ public class FavoritesPresenter implements FavoritesContract.Presenter {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     items.add(new Header(snapshot.getKey()));
                     for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
-                        HairStyle hairStyle = itemSnapshot.getValue(HairStyle.class);
-                        items.add(hairStyle);
+                        Style style = itemSnapshot.getValue(Style.class);
+                        items.add(style);
                     }Log.i(TAG, "onDataChange: "+ snapshot.getValue()+ "  "+snapshot.getKey());
                 }
 

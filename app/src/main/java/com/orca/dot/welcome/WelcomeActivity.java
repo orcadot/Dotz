@@ -1,6 +1,8 @@
 package com.orca.dot.welcome;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.orca.dot.R;
 import com.orca.dot.auth.LoginSignUpActivity;
 import com.orca.dot.auth.ProfileDetailsActivity;
 import com.orca.dot.model.UserDetails;
@@ -30,8 +33,6 @@ public class WelcomeActivity extends AppCompatActivity {
     private static final String TAG = "WelcomeActivity";
 
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
-    private ValueEventListener mListener;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
@@ -40,30 +41,27 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mAuth = FirebaseAuth.getInstance();
-
-        // [START auth_state_listener]
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    onAuthSuccess(user);
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
 
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                SharedPreferences userSharedPref = getApplicationContext().getSharedPreferences(getString(R.string.profile_prefs_file_key), Context.MODE_PRIVATE);
+
+                if (user != null && userSharedPref.getBoolean(getString(R.string.profile_filled), false)) {
+                    onAuthSuccess(userSharedPref.getString(getString(R.string.profile_user_name), ""));
+                }
+                else if (user !=null && !userSharedPref.getBoolean(getString(R.string.profile_filled), false)) {
+                    Intent intent = new Intent(WelcomeActivity.this, ProfileDetailsActivity.class);
+                    startActivity(intent);
+                    finish();
                 } else {
                     Intent intent = new Intent(WelcomeActivity.this, LoginSignUpActivity.class);
                     startActivity(intent);
                     finish();
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
             }
         };
-        // [END auth_state_listener]
-
-        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-            finish();
-            return;
-        }
 
     }
 
@@ -73,55 +71,17 @@ public class WelcomeActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    private void onAuthSuccess(FirebaseUser currentUser) {
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_LOCATION_USER_LISTS).child(currentUser.getUid());
-        mDatabase.keepSynced(true);
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
-                    Intent intent = new Intent(WelcomeActivity.this, ProfileDetailsActivity.class);
-                    intent.putExtra("FRAGMENT_ID", Constants.FRAGMENT_PROFILE_DETAILS);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    UserDetails userDetails = dataSnapshot.getValue(UserDetails.class);
-                    if (userDetails.isFCTFilled) {
-                        Log.i(TAG, "onDataChange: " + userDetails.username);
-                        Intent intent = new Intent(WelcomeActivity.this, StylesActivity.class);
-                        intent.putExtra(Constants.USER_NAME_KEY, userDetails.username);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Intent intent = new Intent(WelcomeActivity.this, ProfileDetailsActivity.class);
-                        intent.putExtra("FRAGMENT_ID", Constants.FRAGMENT_FACECUT);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-            }
+    private void onAuthSuccess(String username) {
+        Intent intent = new Intent(WelcomeActivity.this, StylesActivity.class);
+        intent.putExtra(Constants.USER_NAME_KEY, username);
+        startActivity(intent);
+        finish();
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                Toast.makeText(WelcomeActivity.this, "Failed to load user details.",
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        mDatabase.addValueEventListener(valueEventListener);
-
-        mListener = valueEventListener;
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
-        if (mListener != null) {
-            mDatabase.removeEventListener(mListener);
-        }
-
         mAuth.removeAuthStateListener(mAuthListener);
     }
 }
