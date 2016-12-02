@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="4dp"
     app:cardCornerRadius="2dp"
     app:cardElevation="2dp">
@@ -13,8 +14,7 @@
         android:layout_height="150dp"
         android:layout_gravity="top"
         android:layout_marginBottom="72dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/back" />
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/text"
@@ -35,16 +35,6 @@
         android:gravity="center_vertical"
         android:layout_gravity="bottom">
 
-        <ImageView
-            android:id="@+id/fav"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:background="?attr/selectableItemBackground"
-
-            app:srcCompat="@drawable/ic_favorite_border_dribble_dark_24dp" />
-
         <Button
             android:id="@+id/cart"
             android:layout_width="56dp"
@@ -55,23 +45,24 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:background="@drawable/add_to_cart_back"
-            android:text="+ ADD"
+            tools:text="+ ADD"
             android:textSize="12sp"
             android:textColor="@color/light_icon"
             android:layout_centerVertical="true" />
 
-        <TextView
-            android:id="@+id/numLikes"
+        <ImageView
+            android:id="@+id/fav"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_vertical"
-            android:layout_toEndOf="@+id/fav"
-            android:layout_toRightOf="@+id/fav"
-            android:gravity="left"
-            android:text="0 Likes"
-            android:textColor="@color/text_secondary_dark"
-            android:textSize="14sp" />
+            android:layout_height="48dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:background="?attr/selectableItemBackground"
+            app:srcCompat="@drawable/ic_favorite_border_dribble_dark_24dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/cart"
+            android:layout_toStartOf="@+id/cart"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp" />
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

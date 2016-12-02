@@ -28,6 +28,7 @@ import com.orca.dot.BasePresenter;
 import com.orca.dot.R;
 import com.orca.dot.model.Style;
 import com.orca.dot.model.StyleCategory;
+import com.orca.dot.services.cart.CartActivity;
 import com.orca.dot.services.favorites.FavoritesActivity;
 import com.orca.dot.ui.BaseActivity;
 import com.orca.dot.utils.Constants;
@@ -65,15 +66,16 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
         setContentView(R.layout.activity_home);
         initializeUI();
 
+    }
+
+    private void initializeUI() {
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         assert viewPager != null;
         viewPager.setOffscreenPageLimit(2);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
-        new TabDataPresenter(databaseReference.child("categories"), this);
-
-    }
-
-    private void initializeUI() {
+        new TabDataPresenter(this);
+        mTabDataPresenter.start();
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_left);
@@ -104,8 +106,6 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
     @Override
     protected void onStart() {
         super.onStart();
-        mTabDataPresenter.start();
-        Log.d(TAG, "onStart() called");
     }
 
     @Override
@@ -137,6 +137,7 @@ public class StylesActivity extends BaseActivity implements NavigationView.OnNav
                     ((StylesFragment) fragment).setLayoutManagerNow();
                 break;
             case R.id.action_cart:
+                startActivity(new Intent(StylesActivity.this, CartActivity.class));
                 break;
             case R.id.action_fav:
                 startActivity(new Intent(StylesActivity.this, FavoritesActivity.class));

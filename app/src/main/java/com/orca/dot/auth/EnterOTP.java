@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -34,9 +33,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.R;
 import com.orca.dot.auth.callbacks.OTPVerificationCallback;
 import com.orca.dot.auth.internal.OTPVerification;
-import com.orca.dot.model.UserDetails;
+import com.orca.dot.model.User;
 import com.orca.dot.services.styles.StylesActivity;
+import com.orca.dot.utils.AccountUtils;
 import com.orca.dot.utils.Constants;
+import com.orca.dot.utils.validate.OTPValidator;
 import com.orca.dot.welcome.WelcomeActivity;
 
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener {
@@ -68,7 +69,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
                 countDownTimer.setVisibility(View.GONE);
                 String receivedOTP = intent.getExtras().getString("otp");
                 otpField.setText(receivedOTP);
-                if (isValidOTP(receivedOTP)) {
+                if (new OTPValidator().validate(receivedOTP)) {
                     verifyOTP(receivedOTP);
                 } else {
                     isVerifying = false;
@@ -108,27 +109,17 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
         verifyBtn.setOnClickListener(this);
         countDownTimer = (TextView) findViewById(R.id.countdown_timer);
 
-        // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
-        // [END initialize_auth]
-
-        // [START auth_state_listener]
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    // User is signed in
+                    AccountUtils.setActiveAccount(getApplicationContext(), user.getUid());
                     updateUI(user);
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
             }
         };
-        // [END auth_state_listener]
     }
 
     private void updateUI(FirebaseUser user) {
@@ -144,16 +135,13 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
                     startActivity(intent);
                     finish();
                 } else {
-                    UserDetails userDetails = dataSnapshot.getValue(UserDetails.class);
+                    User user = dataSnapshot.getValue(User.class);
 
-                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.profile_prefs_file_key), MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean(getString(R.string.profile_filled), true);
-                    editor.putString(getString(R.string.profile_user_name), userDetails.username);
-                    editor.apply();
+                    AccountUtils.setName(getApplicationContext(), user.username);
+                    AccountUtils.setProfileFilled(getApplicationContext(), true);
 
                     Intent intent = new Intent(EnterOTP.this, StylesActivity.class);
-                    intent.putExtra(Constants.USER_NAME_KEY, userDetails.username);
+                    intent.putExtra(Constants.USER_NAME_KEY, user.username);
                     startActivity(intent);
                     finish();
                 }
@@ -162,7 +150,6 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                 Toast.makeText(EnterOTP.this, "Failed to load user details.",
                         Toast.LENGTH_SHORT).show();
 
@@ -196,12 +183,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
 
             @Override
             public void otpVerificationSuccess(String token) {
-
-                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.profile_prefs_file_key), Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.phone_number), phone);
-                editor.commit();
-
+                AccountUtils.setPhone(getApplicationContext(), phone);
                 createFirebaseUser(token);
 
                 progressDialog.setMessage("Setting your account");
@@ -211,11 +193,12 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
     }
 
     private void createFirebaseUser(String token) {
-        mAuth.signInWithCustomToken(token)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        Log.d(TAG, "createFirebaseUser() called with: token = [" + token + "]");
+        mAuth.signInWithCustomToken(token).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
+                            Log.d(TAG, "onComplete() called with: task = [" + task + "]");
                             if (progressDialog != null) {
                                 progressDialog.dismiss();
                             }
@@ -284,7 +267,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
         mNumberTextWatcher = new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (isValidOTP(otpField.getText().toString().trim())) {
+                if (new OTPValidator().validate(otpField.getText().toString().trim())) {
                     setButtonsEnabled(true);
                 } else
                     setButtonsEnabled(false);
@@ -305,10 +288,6 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
         otpField.addTextChangedListener(mNumberTextWatcher);
     }
 
-    private boolean isValidOTP(String otp) {
-        String regEx = "^[0-9]{6}$";
-        return otp.matches(regEx);
-    }
 
     private void setButtonsEnabled(boolean enabled) {
         if (enabled) {

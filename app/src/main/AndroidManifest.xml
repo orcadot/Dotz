@@ -20,6 +20,8 @@
         <activity
             android:name=".services.styles.StylesActivity"
             android:theme="@style/AppTheme.Dot.Home" />
+        <activity android:name=".services.cart.CartActivity"
+            android:theme="@style/AppTheme.Dot.Home"/>
         <activity
             android:name=".auth.LoginSignUpActivity"
             android:screenOrientation="portrait"
@@ -42,7 +44,6 @@
             android:targetActivity=".welcome.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>

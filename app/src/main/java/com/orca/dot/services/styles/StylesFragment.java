@@ -32,6 +32,7 @@ import com.orca.dot.BasePresenter;
 import com.orca.dot.R;
 import com.orca.dot.model.Style;
 import com.orca.dot.ui.widgets.FilterDialog;
+import com.orca.dot.utils.AccountUtils;
 import com.orca.dot.utils.Constants;
 
 import java.util.List;
@@ -44,13 +45,10 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
 
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
     private static final String TAG = "StylesFragment";
-    private final int SPAN_COUNT = 2;
-    public String previousCode = "NANANA";
-    private Context mContext = getActivity();
+    private final int SPAN_COUNT = 2;;
+    private Context mContext;
     private int mCategory = -1;
     private RecyclerView recyclerView;
-    private LinearLayoutManager layoutManager;
-    private ValueEventListener valueEventListener;
     private LinearLayoutManager mLayoutManager;
     private LayoutManagerType mCurrentLayoutManagerType;
     private Button switch2;
@@ -59,21 +57,11 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     private TextView cart;
     private TextView filterBar;
     private TextView filterBarClear;
-    private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private ChildEventListener favDataListener;
-    private ChildEventListener styleDataListener;
-    private ChildEventListener childlistenerfordata;
-    private ValueEventListener valueListener;
-    private ChildEventListener cartDataListener;
-
     private StylesDataContract.Presenter mPresenter;
-    private String mDataChildKey;
     private String categoryId;
 
 
-    public StylesFragment() {
-
-    }
+    public StylesFragment() {}
 
     public static StylesFragment newInstance(String category_id) {
         StylesFragment fragment = new StylesFragment();
@@ -94,7 +82,7 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mContext = inflater.getContext();
+        mContext = getActivity();
         View rootview = inflater.inflate(R.layout.item_fragment, container, false);
         rootview.setTag(TAG);
         initializeScreen(rootview);
@@ -149,7 +137,7 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     @Override
     public void onStart() {
         super.onStart();
-        new StylesDataPresenter(databaseReference.child("styles").child(categoryId), this);
+        new StylesDataPresenter(AccountUtils.getActiveAccountName(getActivity().getApplicationContext()), categoryId, this);
         setmyLayoutManager(mCurrentLayoutManagerType);
     }
 
@@ -233,73 +221,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
 
     @Override
     public void onDialogClicked(final String hairLength, String hairQuality, String faceCut) {
-        StringBuilder code = new StringBuilder();
-
-        if (!hairLength.equals("NA")) {
-            code.append(hairLength);
-        }
-        if (!hairQuality.equals("NA")) {
-            code.append(hairQuality);
-        }
-        if (!faceCut.equals("NA"))
-            code.append(faceCut);
-        if (hairLength.equals("NA") && hairQuality.equals("NA") && faceCut.equals("NA"))
-            code.append("NANANA");
-
-        Log.d("filterCode", code.toString());
-        Log.d("previousCode", previousCode.toString());
-        if (!code.toString().isEmpty())
-            if (!previousCode.equals(code.toString())) {
-                previousCode = code.toString();
-                adapterStyle.clear();
-                filterBar.setVisibility(View.VISIBLE);
-                filterBarClear.setVisibility(View.VISIBLE);
-                filterBar.setText(setFilterBarText(hairLength, hairQuality, faceCut).toString());
-
-
-                Query query;
-                if (!code.toString().equals("NANANA"))
-                    query = databaseReference.orderByChild(code.toString()).equalTo("true");
-                else {
-                    query = databaseReference;
-                    filterBar.setVisibility(View.GONE);
-                    filterBarClear.setVisibility(View.GONE);
-                }
-                childlistenerfordata = new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        if (!dataSnapshot.getValue().toString().isEmpty()) {
-
-                            Style style = dataSnapshot.getValue(Style.class);
-                            // style.setLiked(liked);
-                            adapterStyle.add(style);
-
-                        }
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                };
-                query.addChildEventListener(childlistenerfordata);
-                //initQueryforFav();
-            }
     }
 
     private StringBuilder setFilterBarText(String hairLength, String hairQuality, String faceCut) {
@@ -367,17 +288,6 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     @Override
     public void onStop() {
         super.onStop();
-        if (favDataListener != null)
-            databaseReference.removeEventListener(favDataListener);
-        if (styleDataListener != null)
-            databaseReference.removeEventListener(styleDataListener);
-        if (childlistenerfordata != null)
-            databaseReference.removeEventListener(childlistenerfordata);
-        if (valueEventListener != null) {
-            databaseReference.removeEventListener(valueEventListener);
-            Log.i(TAG, "onStop: referece removed");
-        }
-
         mPresenter.stop();
     }
 
@@ -389,17 +299,8 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
 
     @Override
     public void showStylesData(List<Style> dataList) {
-        adapterStyle = new StylesAdapter(mContext, mCurrentLayoutManagerType, dataList, getUid(), this);
+        adapterStyle = new StylesAdapter(mContext, mCurrentLayoutManagerType, dataList, this);
         recyclerView.setAdapter(adapterStyle);
-    }
-
-    @Override
-    public void showUpdatedData(int adapterPosition, Style style) {
-        // adapterStyle.updateDataSet(adapterPosition, style);
-    }
-
-    @Override
-    public void showFavorites() {
     }
 
     @Override
@@ -408,16 +309,11 @@ public class StylesFragment extends Fragment implements FilterDialog.OnDialogCli
     }
 
     public String getUid() {
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        return AccountUtils.getActiveAccountName(getActivity().getApplicationContext());
     }
 
-    public void onFavClicked(String styleKey, int adapterPosition) {
-        Log.d(TAG, "onFavClicked() called with: styleKey = [" + styleKey + "], adapterPosition = [" + adapterPosition + "]");
-        mPresenter.favClicked(styleKey, adapterPosition);
-    }
-
-    public void onAddClicked(String uniqueKey, int adapterPosition) {
-        mPresenter.addClicked(uniqueKey, adapterPosition);
+    public void onFavOrAddClicked(final Style style) {
+        mPresenter.favOrAddClicked(style);
     }
 
     public enum LayoutManagerType {

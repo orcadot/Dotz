@@ -19,14 +19,20 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_cart" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
+    <include layout="@layout/content_cart"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_check_black_24dp" />
+        android:layout_width="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginBottom="48dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/product_hunt"
+        android:text="CHECKOUT"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button"
+        android:textColor="#FFF"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -10,7 +10,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.orca.dot.model.BaseModel;
 import com.orca.dot.model.Style;
-import com.orca.dot.model.Header;
+import com.orca.dot.model.SubHeader;
 import com.orca.dot.utils.Providers;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class FavoritesPresenter implements FavoritesContract.Presenter {
     private List<BaseModel> items;
 
     public FavoritesPresenter(@NonNull FavoritesContract.View favView) {
-        this.mFavReference = FirebaseDatabase.getInstance().getReference().child("user-likes").child(Providers.getUid());
+        this.mFavReference = FirebaseDatabase.getInstance().getReference().child("user-user_likes").child(Providers.getUid());
         this.mFavView = favView;
         items = new ArrayList<>();
         mFavView.setPresenter(this);
@@ -48,7 +48,7 @@ public class FavoritesPresenter implements FavoritesContract.Presenter {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    items.add(new Header(snapshot.getKey()));
+                    items.add(new SubHeader(snapshot.getKey()));
                     for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
                         Style style = itemSnapshot.getValue(Style.class);
                         items.add(style);

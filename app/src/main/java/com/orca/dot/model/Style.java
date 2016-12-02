@@ -17,7 +17,8 @@ public class Style extends BaseModel{
     public long style_date_added;
     public String style_id;
     public String category_id;
-
+    public boolean isLiked;
+    public boolean isAdded;
 
     public Style() {
     }

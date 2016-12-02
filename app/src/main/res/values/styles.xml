@@ -33,6 +33,9 @@
         <item name="android:windowBackground">@drawable/splash_drawable</item>
     </style>
 
+    <style name="Widget.AppTheme.FAB" parent="AppTheme.Dot">
+        <item name="colorAccent">@color/primary</item>
+    </style>
 
     <style name="Widget.AppTheme.Toolbar" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/primary</item>

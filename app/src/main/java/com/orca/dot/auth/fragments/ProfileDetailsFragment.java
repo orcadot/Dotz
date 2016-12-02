@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 
 import com.orca.dot.R;
-import com.orca.dot.model.UserDetails;
+import com.orca.dot.model.User;
 import com.orca.dot.utils.validate.EmailValidator;
 
 public class ProfileDetailsFragment extends Fragment {
@@ -57,9 +57,9 @@ public class ProfileDetailsFragment extends Fragment {
         bindUI(view);
     }
 
-    public void saveProfile(UserDetails userDetails) {
+    public void saveProfile(User user) {
         if (mListener != null) {
-            mListener.onProfileSave(userDetails);
+            mListener.onProfileSave(user);
         }
     }
 
@@ -82,7 +82,7 @@ public class ProfileDetailsFragment extends Fragment {
 
 
     public interface OnProfileSaveClickListener {
-        void onProfileSave(UserDetails userDetails);
+        void onProfileSave(User user);
     }
 
     private void bindUI(View view) {
@@ -120,7 +120,7 @@ public class ProfileDetailsFragment extends Fragment {
                 } else if (!emailValidator.validate(email))
                     Snackbar.make(v, "Email is not valid", Snackbar.LENGTH_LONG).show();
                 else
-                    saveProfile(new UserDetails(name, email, mGender, mGenderCode));
+                    saveProfile(new User(name, email, mGender, mGenderCode));
 
             }
         });

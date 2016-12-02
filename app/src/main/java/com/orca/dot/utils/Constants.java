@@ -13,11 +13,12 @@ public class Constants {
      * Constants related to locations in Firebase, such as the Name of the node
      * where user lists are stored (ie "userLists")
      */
-    public static final String FIREBASE_LOCATION_HAIR_STYLE_DATA = "data";
+    public static final String FIREBASE_LOCATION_STYLE_DATA = "styles";
     public static final String FIREBASE_SALON_DATA = "salonData";
     public static final String FIREBASE_LOCATION_USER_LISTS = "Users";
-    public static final String FIREBASE_LOCATION_USER_FAVORITE = "my_favs";
-    public static final String FIREBASE_LOCATION_USER_CART = "my_cart";
+    public static final String FIREBASE_LOCATION_USER_FAVORITE = "user_likes";
+    public static final String FIREBASE_LOCATION_USER_CART = "user_cart";
+    public static final String FIREBASE_LOCATION_USER_LIKES_CART = "user_likes_cart";
 
     /**
      * Constants for bundles, extras and shared preferences keys

@@ -15,12 +15,10 @@ import com.bumptech.glide.Glide;
 import com.orca.dot.R;
 import com.orca.dot.model.BaseModel;
 import com.orca.dot.model.Style;
-import com.orca.dot.model.Header;
+import com.orca.dot.model.SubHeader;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.orca.dot.utils.Providers.getUid;
 
 
 /**
@@ -59,7 +57,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case TYPE_HEADER:
-                bindHeader((Header) getItem(position), (HeaderHolder) holder);
+                bindHeader((SubHeader) getItem(position), (HeaderHolder) holder);
                 break;
             case TYPE_STYLE:
                 bindStyle((Style) getItem(position), (StyleViewHolder) holder);
@@ -92,8 +90,8 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
-    private void bindHeader(Header header, HeaderHolder holder) {
-        holder.mHeader.setText(header.headerText);
+    private void bindHeader(SubHeader subHeader, HeaderHolder holder) {
+        holder.mHeader.setText(subHeader.headerText);
     }
 
     @Override
@@ -107,7 +105,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         BaseModel model = getItem(position);
         if (model instanceof Style)
             return TYPE_STYLE;
-        else if (model instanceof Header)
+        else if (model instanceof SubHeader)
             return TYPE_HEADER;
         else
             return TYPE_HEADER;
@@ -118,7 +116,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public int getItemColumnSpan(int position) {
-        return getItem(position).colSpan;
+        return getItem(position).getColSpan();
     }
 
     public void add(List<? extends BaseModel> favItems) {
@@ -132,10 +130,10 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void expandHeaders() {
         Log.d(TAG, "expandHeaders() called");
         for (BaseModel item : items) {
-            if (item instanceof Header) {
-                item.colSpan = 2;
+            if (item instanceof SubHeader) {
+                item.setColSpan(2);
             } else
-                item.colSpan = 1;
+                item.setColSpan(1);
         }
     }
 

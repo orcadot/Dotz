@@ -6,7 +6,17 @@ package com.orca.dot.model;
 
 public abstract class BaseModel {
 
-    public int colSpan;
+    private int colSpan;
     public BaseModel() {
     }
+
+    public int getColSpan() {
+        return colSpan;
+    }
+
+    public void setColSpan(int colSpan) {
+        this.colSpan = colSpan;
+    }
+
+
 }
